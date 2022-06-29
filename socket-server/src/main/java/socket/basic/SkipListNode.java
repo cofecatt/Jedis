@@ -1,9 +1,6 @@
 package socket.basic;
 
-/**
- * @Author: HLJ
- * @Date: 2022/2/22 22:42
- */
+
 /**
  * 跳表节点模型对象
  * 1.拥有上下左右四个指针
@@ -17,15 +14,16 @@ public class SkipListNode<T> {
     /**
      * 上下左右四个指针,存的是结点的内存地址
      */
-    public SkipListNode up,down,left,right;
+    public SkipListNode up, down, left, right;
     /**
      * 每个层级头尾节点的key
      */
-    public static final Integer negativeInfinity= Integer.MIN_VALUE; // 负无穷
-    public static final Integer positiveInfinity= Integer.MAX_VALUE; // 正无穷
+    public static final Integer NEGATIVEINTEGER = Integer.MIN_VALUE;
+    public static final Integer POSITIVEINTEGER = Integer.MAX_VALUE;
 
     /**
      * 构造函数
+     *
      * @param key
      * @param value
      */

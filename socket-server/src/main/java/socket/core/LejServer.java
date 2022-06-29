@@ -64,32 +64,32 @@ public class LejServer {
             outputStream = clientSocket.getOutputStream();
             oos = new ObjectOutputStream(outputStream);
             ois = new ObjectInputStream(inputStream);
+            try{
+                while (true) {
+                    assert ois != null;
+                    Command command = (Command) ois.readObject();
+
+                    //2.根据请求计算响应
+                    Response response = process(command);
+
+                    //3.构造响应并返回
+                    oos.writeObject(response);
+                    oos.flush();
+                    //打印
+                    logger.log(Level.INFO,"["+clientSocket.getInetAddress().toString()+":"+
+                            clientSocket.getPort()+"],request:"+command+", response:"+response);
+                }
+
+            }catch (SocketException | EOFException e){
+                //如果连接关闭，才会触发到这个情况！
+                logger.log(Level.INFO,"["+clientSocket.getInetAddress().toString()+":"+
+                        clientSocket.getPort()+"]客户端已下线。");
+            } catch(IOException | ClassNotFoundException e){
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        try{
-            while (true) {
-                assert ois != null;
-                Command command = (Command) ois.readObject();
-
-                //2.根据请求计算响应
-                Response response = process(command);
-
-                //3.构造响应并返回
-                oos.writeObject(response);
-                oos.flush();
-                //打印
-                logger.log(Level.INFO,"["+clientSocket.getInetAddress().toString()+":"+
-                        clientSocket.getPort()+"],request:"+command+", response:"+response);
-            }
-
-        }catch (SocketException | EOFException e){
-            //如果连接关闭，才会触发到这个情况！
-            logger.log(Level.INFO,"["+clientSocket.getInetAddress().toString()+":"+
-                    clientSocket.getPort()+"]客户端已下线。");
-        } catch(IOException | ClassNotFoundException e){
-            e.printStackTrace();
-        }finally{
+        } finally{
             try {
                 assert oos != null;
                 oos.close();
