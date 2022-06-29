@@ -7,8 +7,17 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
+import socket.basic.Command;
+import socket.basic.Response;
+import socket.basic.StrategyContext;
+import socket.constant.OperationConstant;
+import socket.core.LocalMap;
+import socket.interfece.imp.SetOperationStrategy;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author: HLJ
@@ -16,6 +25,8 @@ import java.nio.charset.Charset;
  */
 public class ServerTest {
     public static void main(String[] args) throws InterruptedException {
+        ConcurrentHashMap<String, Object> instance = LocalMap.getInstance();
+
         new ServerBootstrap()
                 .group(new NioEventLoopGroup())
                 .channel(NioServerSocketChannel.class)
@@ -26,11 +37,36 @@ public class ServerTest {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) {
                                 ByteBuf buffer = (ByteBuf) msg;
-                                System.out.println(buffer.toString(Charset.defaultCharset()));
+                                String commend = buffer.toString(Charset.defaultCharset());
+
+                                System.out.println(commend);
+
+                                String[] s = commend.split(" ");
+                                Command command = new Command();
+                                if(s.length > 1) {
+                                    command.setKey(s[1]);
+                                    command.setOrder(s[0]);
+                                }
+                                if(s.length > 2){
+                                    command.setValue(s[2]);
+                                }
+
+                                System.out.println(command);
+
+                                SetOperationStrategy setOperationStrategy = new SetOperationStrategy();
+                                StrategyContext strategyContext = new StrategyContext(setOperationStrategy);
+                                Response set = strategyContext.set(command, instance);
+
+                                for (String s1 : instance.keySet()) {
+                                    System.out.println(instance.get(s1));
+                                }
+
+
+
 
                                 // 建议使用 ctx.alloc() 创建 ByteBuf
                                 ByteBuf response = ctx.alloc().buffer();
-                                response.writeBytes(buffer);
+                                response.writeBytes(set.toString().getBytes());
                                 ctx.writeAndFlush(response);
 
                                 // 思考：需要释放 buffer 吗
