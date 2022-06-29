@@ -1,2 +1,2 @@
 # SoftwareDesign
-用java socket和跳跃表实现redis
+用netty和跳跃表实现redis
