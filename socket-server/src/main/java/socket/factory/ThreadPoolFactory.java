@@ -12,13 +12,12 @@ import java.util.concurrent.TimeUnit;
 public class ThreadPoolFactory {
     public static ThreadPoolExecutor getDefault() {
         //使用线程池
-        ThreadPoolExecutor executorService = new ThreadPoolExecutor(20,
+        return new ThreadPoolExecutor(20,
                 40,
                 10,
                 TimeUnit.SECONDS,
                 new LinkedBlockingDeque<>(10),
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy());
-        return executorService;
     }
 }
