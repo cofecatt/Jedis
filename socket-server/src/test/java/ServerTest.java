@@ -6,17 +6,12 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringDecoder;
 import socket.basic.Command;
-import socket.basic.Response;
 import socket.basic.StrategyContext;
-import socket.constant.OperationConstant;
 import socket.core.LocalMap;
 import socket.interfece.imp.SetOperationStrategy;
 
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -55,7 +50,7 @@ public class ServerTest {
 
                                 SetOperationStrategy setOperationStrategy = new SetOperationStrategy();
                                 StrategyContext strategyContext = new StrategyContext(setOperationStrategy);
-                                Response set = strategyContext.set(command, instance);
+                                Object set = strategyContext.opt(command, instance);
 
                                 for (String s1 : instance.keySet()) {
                                     System.out.println(instance.get(s1));

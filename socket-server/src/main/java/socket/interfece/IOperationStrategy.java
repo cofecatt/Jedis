@@ -1,7 +1,6 @@
 package socket.interfece;
 
 import socket.basic.Command;
-import socket.basic.Response;
 import socket.basic.SkipList;
 
 import java.util.Map;
@@ -17,7 +16,7 @@ public interface IOperationStrategy {
      * @param map map 哈希表
      * @return
      */
-    Response operation(Command command, Map<String, Object> map);
+    Object operation(Command command, Map<String, Object> map);
 
 
     /**
@@ -26,5 +25,5 @@ public interface IOperationStrategy {
      * @param skipList 跳表
      * @return
      */
-    Response operation(Command command, SkipList skipList);
+    Object operation(Command command, SkipList skipList);
 }

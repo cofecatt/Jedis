@@ -37,7 +37,7 @@ public class ClientTest {
                             }
                         });
                     }
-                }).connect("127.0.0.1", 8000).sync().channel();
+                }).connect("127.0.0.1", 9090).sync().channel();
 
         channel.closeFuture().addListener(future -> {
             group.shutdownGracefully();

@@ -16,6 +16,12 @@ import java.util.logging.Logger;
  */
 public class ResourceLoader {
     private final static Logger logger = Logger.getLogger("Server-ResourceLoader");
+
+    /**
+     * 防止控制台重复打印端口信息
+     */
+    private static int cnt = 0;
+
     public static Domain getResource() {
 
         Domain domain = new Domain();
@@ -37,8 +43,9 @@ public class ResourceLoader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        if(Objects.nonNull(domain.getPort())) {
+        if(Objects.nonNull(domain.getPort()) && cnt == 0) {
             logger.log(Level.INFO, "port="+domain.getPort());
+            cnt++;
         } else {
             logger.log(Level.FINE, "boot.properties配置出错");
         }

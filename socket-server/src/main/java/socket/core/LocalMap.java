@@ -10,8 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LocalMap {
     private static ConcurrentHashMap<String, Object> concurrentHashMap;
+    private static Domain resource = null;
     static {
-        Domain resource = ResourceLoader.getResource();
+        resource = ResourceLoader.getResource();
         concurrentHashMap = new ConcurrentHashMap<String, Object>(resource.getMinMapSize());
     }
     private LocalMap(){}

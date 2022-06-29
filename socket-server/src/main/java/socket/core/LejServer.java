@@ -1,18 +1,24 @@
 package socket.core;
 
 
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import socket.basic.Command;
 import socket.basic.Domain;
-import socket.basic.Response;
-import socket.constant.Errors;
+import socket.basic.StrategyContext;
 import socket.constant.OperationConstant;
 import socket.factory.ThreadPoolFactory;
+import socket.interfece.IOperationStrategy;
+import socket.interfece.imp.GetOperationStrategy;
+import socket.interfece.imp.SetOperationStrategy;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
-import java.util.Objects;
+import java.nio.charset.Charset;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,108 +28,59 @@ import java.util.logging.Logger;
  */
 public class LejServer {
     private final static Logger logger = Logger.getLogger("LejServer");
-    private ServerSocket listenSocket;
     private final ConcurrentHashMap<String, Object> instance = LocalMap.getInstance();
     private final ThreadPoolExecutor executor = ThreadPoolFactory.getDefault();
-
+    private Domain resource = null;
     public LejServer(){
-        Domain resource = ResourceLoader.getResource();
-        try {
-            listenSocket = new ServerSocket(Integer.parseInt(resource.getPort()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        resource = ResourceLoader.getResource();
     }
 
     public void start(){
         logger.log(Level.INFO,"服务器启动！");
 
-        while (true) {
-            //在这个代码中，通过创建线程，就能保证在调用完accept()之后就能立刻再次返回调用accept().
-            Socket clientSocket = null;
-            try {
-                clientSocket = listenSocket.accept();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            //创建一个线程池来给客户端提供服务
-            Socket finalClientSocket = clientSocket;
-            executor.submit(() -> processConnection(finalClientSocket));
-        }
+        new ServerBootstrap()
+                .group(new NioEventLoopGroup())
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new ChannelInitializer<NioSocketChannel>() {
+                    @Override
+                    protected void initChannel(NioSocketChannel ch) {
+                        ch.pipeline().addLast(new ChannelInboundHandlerAdapter(){
+                            @Override
+                            public void channelRead(ChannelHandlerContext ctx, Object msg) {
+                                ByteBuf buffer = (ByteBuf) msg;
+                                String commend = buffer.toString(Charset.defaultCharset());
+
+                                // comend结构示例 set hello world
+                                // get hello
+                                // 返回 world
+                                String[] s = commend.split(" ");
+                                Command command = new Command();
+                                if(s.length > 0) {
+                                    Object res = null;
+                                    IOperationStrategy operationStrategy = null;
+                                    if(s[0].equalsIgnoreCase(OperationConstant.GET)) {
+                                        operationStrategy = new GetOperationStrategy();
+
+                                    } else if(s[0].equalsIgnoreCase(OperationConstant.SET)) {
+                                         operationStrategy = new SetOperationStrategy();
+                                         command.setValue(s[2]);
+                                    }else {
+                                        return;
+                                    }
+                                    command.setOrder(s[0]);
+                                    command.setKey(s[1]);
+                                    StrategyContext strategyContext = new StrategyContext(operationStrategy);
+                                    res = strategyContext.opt(command, instance);
+                                    ByteBuf response = ctx.alloc().buffer();
+                                    response.writeBytes(res.toString().getBytes());
+                                    ctx.writeAndFlush(response);
+                                }
+                            }
+                        });
+                    }
+                }).bind(Integer.parseInt(resource.getPort()));
     }
 
-    private void processConnection(Socket clientSocket) {
-        logger.log(Level.INFO,"["+clientSocket.getInetAddress().toString()+":"+
-                clientSocket.getPort()+"]客户端已上线！");
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        ObjectOutputStream oos = null;
-        ObjectInputStream ois = null;
-        try {
-            inputStream = clientSocket.getInputStream();
-            outputStream = clientSocket.getOutputStream();
-            oos = new ObjectOutputStream(outputStream);
-            ois = new ObjectInputStream(inputStream);
-            try{
-                while (true) {
-                    assert ois != null;
-                    Command command = (Command) ois.readObject();
-
-                    //2.根据请求计算响应
-                    Response response = process(command);
-
-                    //3.构造响应并返回
-                    oos.writeObject(response);
-                    oos.flush();
-                    //打印
-                    logger.log(Level.INFO,"["+clientSocket.getInetAddress().toString()+":"+
-                            clientSocket.getPort()+"],request:"+command+", response:"+response);
-                }
-
-            }catch (SocketException | EOFException e){
-                //如果连接关闭，才会触发到这个情况！
-                logger.log(Level.INFO,"["+clientSocket.getInetAddress().toString()+":"+
-                        clientSocket.getPort()+"]客户端已下线。");
-            } catch(IOException | ClassNotFoundException e){
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally{
-            try {
-                assert oos != null;
-                oos.close();
-                assert ois != null;
-                ois.close();
-                assert inputStream != null;
-                inputStream.close();
-                assert outputStream != null;
-                outputStream.close();
-                clientSocket.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-    public Response process(Command request) {
-        if(Objects.isNull(request)) {
-            return Response.error(Errors.BAD_PARAM);
-        }
-        String key = request.getKey();
-        String order = request.getOrder();
-        Object value = request.getValue();
-
-        if(OperationConstant.SET.equals(order)) {
-            if(Objects.isNull(value)) {
-                return Response.error(Errors.BAD_PARAM);
-            }
-            return Response.ok(instance.put(key, value));
-        } else if(OperationConstant.GET.equals(order)) {
-            return Response.ok(instance.get(key));
-        }
-        return Response.error(Errors.BAD_PARAM);
-    }
 
     public static void main(String[] args) {
         LejServer tcpThreadPoolEchoServer = new LejServer();
