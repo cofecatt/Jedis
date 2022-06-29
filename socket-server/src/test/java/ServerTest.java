@@ -8,6 +8,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 
+import java.nio.charset.Charset;
+
 /**
  * @Author: HLJ
  * @Date: 2022/5/23 8:49
@@ -19,19 +21,24 @@ public class ServerTest {
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
-                    protected void initChannel(NioSocketChannel nioSocketChannel) throws Exception {
-                        nioSocketChannel.pipeline().addLast(new StringDecoder());
-                        nioSocketChannel.pipeline().addLast(new ChannelInboundHandlerAdapter(){
+                    protected void initChannel(NioSocketChannel ch) {
+                        ch.pipeline().addLast(new ChannelInboundHandlerAdapter(){
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) {
-                                System.out.println(msg);
-                                ByteBuf buffer = ctx.alloc().buffer(20);
-                                buffer.writeBytes("hello!!!".getBytes());
-                                ctx.writeAndFlush(buffer);
+                                ByteBuf buffer = (ByteBuf) msg;
+                                System.out.println(buffer.toString(Charset.defaultCharset()));
+
+                                // 建议使用 ctx.alloc() 创建 ByteBuf
+                                ByteBuf response = ctx.alloc().buffer();
+                                response.writeBytes(buffer);
+                                ctx.writeAndFlush(response);
+
+                                // 思考：需要释放 buffer 吗
+                                // 思考：需要释放 response 吗
                             }
                         });
                     }
-                }).bind(7000);
+                }).bind(8000);
     }
 }
 
