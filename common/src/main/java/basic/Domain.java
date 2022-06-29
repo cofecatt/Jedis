@@ -1,4 +1,4 @@
-package socket.basic;
+package basic;
 
 /**
  * @Author: HLJ
@@ -7,7 +7,15 @@ package socket.basic;
 public class Domain {
     private String ip;
     private String port;
-    private Integer minMapSize;
+    private int minMapSize;
+
+    public int getMinMapSize() {
+        return minMapSize;
+    }
+
+    public void setMinMapSize(int minMapSize) {
+        this.minMapSize = minMapSize;
+    }
 
     public String getIp() {
         return ip;
@@ -18,20 +26,11 @@ public class Domain {
         return "Domain{" +
                 "ip='" + ip + '\'' +
                 ", port='" + port + '\'' +
-                ", minMapSize=" + minMapSize +
                 '}';
     }
 
     public void setIp(String ip) {
         this.ip = ip;
-    }
-
-    public Integer getMinMapSize() {
-        return minMapSize;
-    }
-
-    public void setMinMapSize(Integer minMapSize) {
-        this.minMapSize = minMapSize;
     }
 
     public String getPort() {

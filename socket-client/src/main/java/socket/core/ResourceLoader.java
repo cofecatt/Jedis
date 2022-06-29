@@ -1,6 +1,6 @@
 package socket.core;
 
-import socket.basic.Domain;
+import basic.Domain;
 
 import java.io.IOException;
 import java.io.InputStream;

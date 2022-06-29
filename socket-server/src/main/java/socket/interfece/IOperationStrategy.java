@@ -1,6 +1,6 @@
 package socket.interfece;
 
-import socket.basic.Command;
+import basic.Command;
 import socket.basic.SkipList;
 
 import java.util.Map;

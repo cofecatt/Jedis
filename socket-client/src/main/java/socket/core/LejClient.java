@@ -1,7 +1,7 @@
 package socket.core;
 
-import socket.basic.Command;
-import socket.basic.Domain;
+import basic.Domain;
+import basic.Command;
 import socket.basic.Response;
 import java.io.*;
 import java.net.Socket;

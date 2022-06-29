@@ -1,6 +1,6 @@
 package socket.interfece.imp;
 
-import socket.basic.Command;
+import basic.Command;
 import socket.basic.SkipList;
 import socket.basic.SkipListNode;
 import socket.constant.Errors;

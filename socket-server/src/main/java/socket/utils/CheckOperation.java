@@ -1,6 +1,6 @@
 package socket.utils;
 
-import socket.basic.Command;
+import basic.Command;
 import socket.constant.OperationConstant;
 
 /**
