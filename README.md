@@ -1,2 +1,2 @@
-# SoftwareDesign
+# 基于netty实现java版本的redis
 用netty和跳跃表实现redis
