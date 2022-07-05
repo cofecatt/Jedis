@@ -1,24 +1,18 @@
 package socket.core;
 
 
-import basic.Command;
 import basic.Domain;
+import socket.handler.CommandHandler;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import socket.basic.StrategyContext;
-import socket.constant.OperationConstant;
-import socket.factory.ThreadPoolFactory;
-import socket.interfece.IOperationStrategy;
-import socket.interfece.imp.GetOperationStrategy;
-import socket.interfece.imp.SetOperationStrategy;
+import socket.basic.LocalMap;
+import factory.ThreadPoolFactory;
+import protocol.MyProtocol;
+import protocol.ProtocolFrameDecoder;
 
-import java.nio.charset.Charset;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,63 +22,48 @@ import java.util.logging.Logger;
  */
 public class LejServer {
     private final static Logger logger = Logger.getLogger("LejServer");
-    private final ConcurrentHashMap<String, Object> instance = LocalMap.getInstance();
-    private final ThreadPoolExecutor executor = ThreadPoolFactory.getDefault();
-    private Domain resource = null;
+    private final ConcurrentHashMap<String, Object> instance;
+    private final ThreadPoolExecutor executor;
+    private Domain resource;
+
     public LejServer(){
         resource = ResourceLoader.getResource();
+        instance = LocalMap.getInstance();
+        executor = ThreadPoolFactory.getDefault();
     }
 
     public void start(){
         logger.log(Level.INFO,"服务器启动！");
-
-        new ServerBootstrap()
-                .group(new NioEventLoopGroup())
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new ChannelInitializer<NioSocketChannel>() {
-                    @Override
-                    protected void initChannel(NioSocketChannel ch) {
-                        ch.pipeline().addLast(new ChannelInboundHandlerAdapter(){
-                            @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object msg) {
-                                ByteBuf buffer = (ByteBuf) msg;
-                                String commend = buffer.toString(Charset.defaultCharset());
-
-                                // comend结构示例 set hello world
-                                // get hello
-                                // 返回 world
-                                String[] s = commend.split(" ");
-                                Command command = new Command();
-                                if(s.length > 0) {
-                                    Object res = null;
-                                    IOperationStrategy operationStrategy = null;
-                                    if(s[0].equalsIgnoreCase(OperationConstant.GET)) {
-                                        operationStrategy = new GetOperationStrategy();
-
-                                    } else if(s[0].equalsIgnoreCase(OperationConstant.SET)) {
-                                         operationStrategy = new SetOperationStrategy();
-                                         command.setValue(s[2]);
-                                    }else {
-                                        return;
-                                    }
-                                    command.setOrder(s[0]);
-                                    command.setKey(s[1]);
-                                    StrategyContext strategyContext = new StrategyContext(operationStrategy);
-                                    res = strategyContext.opt(command, instance);
-                                    ByteBuf response = ctx.alloc().buffer();
-                                    response.writeBytes(res.toString().getBytes());
-                                    ctx.writeAndFlush(response);
-                                }
-                            }
-                        });
-                    }
-                }).bind(Integer.parseInt(resource.getPort()));
+        NioEventLoopGroup boss = new NioEventLoopGroup();
+        NioEventLoopGroup worker = new NioEventLoopGroup();
+        MyProtocol myProtocol = new MyProtocol();
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        CommandHandler commandHandler = new CommandHandler();
+        serverBootstrap.group(boss, worker);
+        serverBootstrap.channel(NioServerSocketChannel.class);
+        try {
+            serverBootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
+                @Override
+                protected void initChannel(SocketChannel ch) throws Exception {
+                    ch.pipeline().addLast(new ProtocolFrameDecoder());
+                    ch.pipeline().addLast(myProtocol);
+                    ch.pipeline().addLast(commandHandler);
+                }
+            });
+            Channel channel = serverBootstrap.bind(Integer.parseInt(resource.getPort())).sync().channel();
+            channel.closeFuture().sync();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            boss.shutdownGracefully();
+            worker.shutdownGracefully();
+        }
     }
 
 
     public static void main(String[] args) {
-        LejServer tcpThreadPoolEchoServer = new LejServer();
-        tcpThreadPoolEchoServer.start();
+        LejServer server = new LejServer();
+        server.start();
     }
 
 }

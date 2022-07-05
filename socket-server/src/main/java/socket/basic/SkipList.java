@@ -10,6 +10,8 @@ import java.util.Random;
  * 实现：查询、新增、删除、修改的功能
  */
 public class SkipList<T> {
+    public static final SkipList<String> def = new SkipList<>();
+
     /**
      * 跳表的头尾是head和tail结点
      */
@@ -59,7 +61,7 @@ public class SkipList<T> {
      * 新增或者修改
      * @param key
      */
-    public void put(Integer key, T value) {
+    public void set(Integer key, T value) {
         // 根据key查询跳表中是否存在对应的节点
         SkipListNode<T> p = findNode(key);
         // 存在节点就修改值
@@ -76,10 +78,10 @@ public class SkipList<T> {
 
     /**
      * 根据key查对应对节点
-     * @param key
-     * @return
+     * @param key key
+     * @return 查到找的节点
      */
-    public SkipListNode<T> search(Integer key) {
+    public SkipListNode<T> get(Integer key) {
         SkipListNode<T> node = findNode(key);
         if (Objects.equals(node.getKey(), key)) {
             return node;

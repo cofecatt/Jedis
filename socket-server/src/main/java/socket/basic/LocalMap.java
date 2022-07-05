@@ -1,6 +1,7 @@
-package socket.core;
+package socket.basic;
 
 import basic.Domain;
+import socket.core.ResourceLoader;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,11 +10,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date: 2022/5/20 20:29
  */
 public class LocalMap {
-    private static ConcurrentHashMap<String, Object> concurrentHashMap;
-    private static Domain resource = null;
+    private static final ConcurrentHashMap<String, Object> concurrentHashMap;
+    private static final Domain resource;
     static {
         resource = ResourceLoader.getResource();
-        concurrentHashMap = new ConcurrentHashMap<String, Object>(resource.getMinMapSize());
+        concurrentHashMap = new ConcurrentHashMap<>(resource.getMinMapSize());
     }
     private LocalMap(){}
     public static ConcurrentHashMap<String, Object> getInstance() {

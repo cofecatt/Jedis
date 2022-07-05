@@ -1,4 +1,3 @@
-import socket.basic.Response;
 import socket.core.LejClient;
 
 /**
@@ -7,7 +6,6 @@ import socket.core.LejClient;
  */
 public class Test {
     public static void main(String[] args) {
-//        LejClient.execute("set", "a", "b");
-        Response execute = LejClient.execute("get", "a", null);
+
     }
 }

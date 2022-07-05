@@ -2,9 +2,9 @@ package socket.interfece.imp;
 
 import basic.Command;
 import socket.basic.SkipList;
-import socket.constant.Errors;
+import constant.Errors;
 import socket.interfece.IOperationStrategy;
-import socket.utils.CheckOperation;
+import utils.CheckOperation;
 
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class SetOperationStrategy implements IOperationStrategy {
             Object value = command.getValue();
             try {
                 int i = Integer.parseInt(key);
-                skipList.put(i, value);
+                skipList.set(i, value);
             }catch (NumberFormatException e) {
                 e.printStackTrace();
                 return Errors.BAD_PARAM.toString();

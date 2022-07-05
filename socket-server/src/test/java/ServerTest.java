@@ -8,7 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import socket.basic.StrategyContext;
-import socket.core.LocalMap;
+import socket.basic.LocalMap;
 import socket.interfece.imp.SetOperationStrategy;
 
 import java.nio.charset.Charset;

@@ -1,4 +1,4 @@
-package socket.factory;
+package factory;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;

@@ -1,4 +1,4 @@
-package socket.constant;
+package constant;
 
 /**
  * @Author: HLJ

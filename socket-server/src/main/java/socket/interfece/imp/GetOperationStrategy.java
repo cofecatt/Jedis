@@ -3,9 +3,9 @@ package socket.interfece.imp;
 import basic.Command;
 import socket.basic.SkipList;
 import socket.basic.SkipListNode;
-import socket.constant.Errors;
+import constant.Errors;
 import socket.interfece.IOperationStrategy;
-import socket.utils.CheckOperation;
+import utils.CheckOperation;
 
 import java.util.Map;
 
@@ -34,9 +34,9 @@ public class GetOperationStrategy implements IOperationStrategy {
             String key = command.getKey();
             try {
                 int i = Integer.parseInt(key);
-                SkipListNode search = skipList.search(i);
+                SkipListNode search = skipList.get(i);
                 if(search != null) {
-                    return search;
+                    return search.getValue();
                 }
             }catch (NumberFormatException e) {
                 e.printStackTrace();

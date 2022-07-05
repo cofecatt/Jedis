@@ -1,11 +1,29 @@
 package socket.core;
 
-import basic.Domain;
 import basic.Command;
-import socket.basic.Response;
-import java.io.*;
-import java.net.Socket;
-import java.util.logging.Level;
+import basic.Domain;
+
+import basic.Message;
+import basic.Response;
+import constant.OperationConstant;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.string.StringEncoder;
+import factory.ThreadPoolFactory;
+import protocol.MyProtocol;
+import protocol.ProtocolFrameDecoder;
+import protocol.SequenceIdGenerator;
+
+import java.nio.charset.Charset;
+import java.util.Scanner;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import java.util.logging.Logger;
 
 /**
@@ -14,66 +32,66 @@ import java.util.logging.Logger;
  */
 public class LejClient {
     private final static Logger logger = Logger.getLogger("LejClient");
-    private static Socket socket;
+    private static Channel channel = null;
+    private static final Domain resource = ResourceLoader.getResource();
+    private static final ThreadPoolExecutor threadPoolExecutor = ThreadPoolFactory.getDefault();
+    private static final NioEventLoopGroup group;
+    static  {
+        group = new NioEventLoopGroup();
 
-    static {
-        Domain resource = ResourceLoader.getResource();
         try {
-            socket = new Socket(resource.getIp(),
-                        Integer.parseInt(resource.getPort()));
-        } catch (IOException e) {
+            channel = new Bootstrap()
+                    .group(group)
+                    .channel(NioSocketChannel.class)
+                    .handler(new ChannelInitializer<NioSocketChannel>() {
+                        @Override
+                        protected void initChannel(NioSocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new ProtocolFrameDecoder());
+                            ch.pipeline().addLast(new MyProtocol());
+                            ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+                                @Override
+                                public void channelRead(ChannelHandlerContext ctx, Object msg) {
+                                    Response msg1 = (Response) msg;
+                                    System.out.println(msg1.getCode() == 0 ? msg1.getRes() : msg1.getMsg());
+                                    System.out.print(resource.getIp()+":"+resource.getPort()+">");
+                                }
+                            });
+                        }
+                    }).connect(resource.getIp(), Integer.parseInt(resource.getPort())).sync().channel();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        channel.closeFuture().addListener(future -> {
+            System.out.println("连接关闭");
+            group.shutdownGracefully();
+        });
     }
 
-    private LejClient() {}
+    public static void main(String[] args) {
+        threadPoolExecutor.execute(() -> {
 
-    /**
-     * 执行操作
-     * @param order 操作指令
-     * @param key key
-     * @param value value 如果是赋值命令的话
-     * @return 返回结果
-     */
-    public static Response execute(String order, String key, String value) {
-        InputStream inputStream;
-        OutputStream outputStream;
-        ObjectOutputStream oos = null;
-        ObjectInputStream ois = null;
-        try {
-            inputStream = socket.getInputStream();
-            outputStream = socket.getOutputStream();
-            oos = new ObjectOutputStream(outputStream);
-            ois = new ObjectInputStream(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            //1.将读取的内容构造成请求发送给服务器
-            Command command = new Command();
-            command.setKey(key);
-            command.setOrder(order);
-            command.setValue(value);
-            assert oos != null;
-            oos.writeObject(command);
-            oos.flush();
-
-            //3.从服务器读取响应并解析
-            assert ois != null;
-            Response response = (Response) ois.readObject();
-            //4.把结果显示到界面
-            logger.log(Level.INFO, "request:"+command+" response:"+response);
-            return response;
-        }catch(IOException | ClassNotFoundException e){
-            e.printStackTrace();
-        }finally{
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                System.out.print(resource.getIp()+":"+resource.getPort()+">");
+                String line = scanner.nextLine();
+                if ("exit".equals(line)) {
+                    channel.close();
+                    break;
+                }
+                String[] s = line.split(" ");
+                Command command = new Command();
+                if(s.length > 1) {
+                    command.setOrder(s[0]);
+                    command.setKey(s[1]);
+                }
+                if(s.length > 2) {
+                    command.setValue(s[2]);
+                }
+                command.setSequenceId(SequenceIdGenerator.nextId());
+                command.setMessageType(Message.Command);
+                channel.writeAndFlush(command);
             }
-        }
-        return null;
+        });
     }
 }

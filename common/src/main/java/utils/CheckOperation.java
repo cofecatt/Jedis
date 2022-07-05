@@ -1,7 +1,7 @@
-package socket.utils;
+package utils;
 
 import basic.Command;
-import socket.constant.OperationConstant;
+import constant.OperationConstant;
 
 /**
  * @Author: HLJ
