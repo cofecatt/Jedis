@@ -3,9 +3,9 @@ package socket.interfece.imp;
 import basic.Command;
 import socket.basic.SkipList;
 import socket.basic.SkipListNode;
-import constant.Errors;
+import socket.constant.Errors;
 import socket.interfece.IOperationStrategy;
-import utils.CheckOperation;
+import socket.utils.CheckOperation;
 
 import java.util.Map;
 

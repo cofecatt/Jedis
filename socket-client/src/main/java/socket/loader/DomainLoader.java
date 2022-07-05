@@ -1,4 +1,4 @@
-package socket.core;
+package socket.loader;
 
 import basic.Domain;
 
@@ -12,14 +12,14 @@ import java.util.logging.Logger;
  * @Author: HLJ
  * @Date: 2022/5/20 19:39
  */
-public class ResourceLoader {
+public class DomainLoader {
     private final static Logger logger = Logger.getLogger("Client-ResourceLoader");
     public static Domain getResource() {
 
         Domain domain = new Domain();
         Properties properties = new Properties();
         try {
-            InputStream inputStream = ResourceLoader.class.getResourceAsStream("/boot.properties");
+            InputStream inputStream = DomainLoader.class.getResourceAsStream("/boot.properties");
             properties.load(inputStream);
             Iterator<String> it = properties.stringPropertyNames().iterator();
             while (it.hasNext()) {

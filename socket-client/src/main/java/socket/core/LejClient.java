@@ -5,22 +5,19 @@ import basic.Domain;
 
 import basic.Message;
 import basic.Response;
-import constant.OperationConstant;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringEncoder;
 import factory.ThreadPoolFactory;
 import protocol.MyProtocol;
 import protocol.ProtocolFrameDecoder;
 import protocol.SequenceIdGenerator;
+import socket.loader.DomainLoader;
 
-import java.nio.charset.Charset;
 import java.util.Scanner;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -33,7 +30,7 @@ import java.util.logging.Logger;
 public class LejClient {
     private final static Logger logger = Logger.getLogger("LejClient");
     private static Channel channel = null;
-    private static final Domain resource = ResourceLoader.getResource();
+    private static final Domain resource = DomainLoader.getResource();
     private static final ThreadPoolExecutor threadPoolExecutor = ThreadPoolFactory.getDefault();
     private static final NioEventLoopGroup group;
     static  {

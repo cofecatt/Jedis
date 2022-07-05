@@ -1,7 +1,7 @@
-package utils;
+package socket.utils;
 
 import basic.Command;
-import constant.OperationConstant;
+import socket.constant.OperationConstant;
 
 /**
  * @Author: HLJ
@@ -14,6 +14,10 @@ public class CheckOperation {
                 return command.getValue() != null && command.getKey() != null;
             }else if(OperationConstant.GET.equalsIgnoreCase(command.getOrder())) {
                 return command.getKey() != null;
+            }else if(OperationConstant.HGET.equalsIgnoreCase(command.getOrder())) {
+                return command.getKey() != null;
+            }else if(OperationConstant.HSET.equalsIgnoreCase(command.getOrder())) {
+                return command.getValue() != null && command.getKey() != null;
             }
         }
         return false;

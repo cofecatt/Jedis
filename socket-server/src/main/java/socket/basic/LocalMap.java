@@ -1,7 +1,9 @@
 package socket.basic;
 
 import basic.Domain;
-import socket.core.ResourceLoader;
+import socket.loader.CustomLoader;
+import socket.loader.DomainLoader;
+import socket.save.BgSave;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,10 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LocalMap {
     private static final ConcurrentHashMap<String, Object> concurrentHashMap;
-    private static final Domain resource;
     static {
-        resource = ResourceLoader.getResource();
-        concurrentHashMap = new ConcurrentHashMap<>(resource.getMinMapSize());
+        concurrentHashMap = (ConcurrentHashMap<String, Object>) BgSave.reload();
     }
     private LocalMap(){}
     public static ConcurrentHashMap<String, Object> getInstance() {

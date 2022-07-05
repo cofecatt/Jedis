@@ -2,16 +2,15 @@ package socket.handler;
 
 import basic.Command;
 import basic.Response;
-import constant.OperationConstant;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import socket.basic.LocalMap;
 import socket.basic.SkipList;
 import socket.basic.StrategyContext;
+import socket.constant.OperationConstant;
 import socket.interfece.IOperationStrategy;
-import socket.interfece.imp.GetOperationStrategy;
-import socket.interfece.imp.SetOperationStrategy;
+
 
 /**
  * @Author: HLJ
@@ -21,20 +20,24 @@ import socket.interfece.imp.SetOperationStrategy;
 public class CommandHandler extends SimpleChannelInboundHandler<Command> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Command msg) throws Exception {
-        Object res;
+        Object res = null;
+        String order;
         IOperationStrategy operationStrategy = null;
         if(msg != null) {
-            if(OperationConstant.GET.equalsIgnoreCase(msg.getOrder())) {
-                operationStrategy = new GetOperationStrategy();
-
-            } else if(OperationConstant.SET.equalsIgnoreCase(msg.getOrder())) {
-                operationStrategy = new SetOperationStrategy();
+            order = msg.getOrder();
+            if(order != null) {
+                operationStrategy = OperationConstant.getOperationStrategy(order);
+                StrategyContext strategyContext = new StrategyContext(operationStrategy);
+                String s = order.toLowerCase();
+                if(s.contains("h")) {
+                    res = strategyContext.opt(msg, LocalMap.getInstance());
+                } else {
+                    res = strategyContext.opt(msg, SkipList.def);
+                }
             }
-        }else {
-            return;
         }
-        StrategyContext strategyContext = new StrategyContext(operationStrategy);
-        res = strategyContext.opt(msg, SkipList.def);
+
+        //将结果封装成response对象
         Response response = new Response();
         response.setCode(0);
         response.setRes(res);

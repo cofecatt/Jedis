@@ -12,6 +12,7 @@ import socket.basic.LocalMap;
 import factory.ThreadPoolFactory;
 import protocol.MyProtocol;
 import protocol.ProtocolFrameDecoder;
+import socket.loader.DomainLoader;
 
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -27,7 +28,7 @@ public class LejServer {
     private Domain resource;
 
     public LejServer(){
-        resource = ResourceLoader.getResource();
+        resource = DomainLoader.getResource();
         instance = LocalMap.getInstance();
         executor = ThreadPoolFactory.getDefault();
     }

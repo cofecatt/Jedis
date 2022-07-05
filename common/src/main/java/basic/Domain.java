@@ -7,15 +7,7 @@ package basic;
 public class Domain {
     private String ip;
     private String port;
-    private int minMapSize;
 
-    public int getMinMapSize() {
-        return minMapSize;
-    }
-
-    public void setMinMapSize(int minMapSize) {
-        this.minMapSize = minMapSize;
-    }
 
     public String getIp() {
         return ip;
