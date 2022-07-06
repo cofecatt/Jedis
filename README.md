@@ -1,12 +1,12 @@
 # 							                        Jadis v1.0.1
 
-​														**基于java和netty打造的基于内存的缓存**
+​														**基于java和netty打造的内存缓存**
 
 
 
 ## 功能介绍
 
-改系统分为三个模块，一个是通信协议公共模块，一个客户端模块，一个服务端模块，采用netty和自定义协议进行双向NIO通信，目前基于跳跃表和ConcurrentHashMap实现了set，get，hset，hget功能，采用异步线程将数据保存在test.txt中。
+改系统分为三个模块，一个是通信协议公共模块，一个是客户端模块，一个是服务端模块，采用netty和自定义协议进行双向NIO通信，目前基于跳跃表和ConcurrentHashMap实现了set，get，hset，hget功能，采用异步线程将数据保存在test.txt中。
 
 
 
