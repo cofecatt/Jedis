@@ -32,8 +32,7 @@ public class SetOperationStrategy implements IOperationStrategy {
             String key = command.getKey();
             Object value = command.getValue();
             try {
-                int i = Integer.parseInt(key);
-                skipList.set(i, value);
+                skipList.set(key, value);
             }catch (NumberFormatException e) {
                 e.printStackTrace();
                 return Errors.BAD_PARAM.toString();

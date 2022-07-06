@@ -33,8 +33,7 @@ public class GetOperationStrategy implements IOperationStrategy {
         if(CheckOperation.check(command)) {
             String key = command.getKey();
             try {
-                int i = Integer.parseInt(key);
-                SkipListNode search = skipList.get(i);
+                SkipListNode search = skipList.get(key);
                 if(search != null) {
                     return search.getValue();
                 }

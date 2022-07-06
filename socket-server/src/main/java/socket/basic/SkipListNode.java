@@ -9,7 +9,7 @@ public class SkipListNode<T> {
     /**
      * data存储结构，key定义成integer是为了使用
      */
-    private Integer key;
+    private String key;
     private T value;
     /**
      * 上下左右四个指针,存的是结点的内存地址
@@ -18,8 +18,8 @@ public class SkipListNode<T> {
     /**
      * 每个层级头尾节点的key
      */
-    public static final Integer NEGATIVEINTEGER = Integer.MIN_VALUE;
-    public static final Integer POSITIVEINTEGER = Integer.MAX_VALUE;
+    public static final String NEGATIVEINTEGER = String.valueOf(Integer.MIN_VALUE);
+    public static final String POSITIVEINTEGER = String.valueOf(Integer.MAX_VALUE);
 
     /**
      * 构造函数
@@ -27,16 +27,16 @@ public class SkipListNode<T> {
      * @param key
      * @param value
      */
-    public SkipListNode(Integer key, T value) {
+    public SkipListNode(String key, T value) {
         this.key = key;
         this.value = value;
     }
 
-    public Integer getKey() {
+    public String getKey() {
         return key;
     }
 
-    public void setKey(Integer key) {
+    public void setKey(String key) {
         this.key = key;
     }
 

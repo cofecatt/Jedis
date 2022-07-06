@@ -5,6 +5,9 @@ package basic;
  * @Date: 2022/7/4 17:33
  */
 public class Response extends Message {
+
+    private static final long serialVersionUID = 23213212L;
+
     /**
      * 状态码
      */

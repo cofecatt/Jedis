@@ -15,8 +15,8 @@ public class SkipList<T> {
     /**
      * 跳表的头尾是head和tail结点
      */
-    private final SkipListNode<T> head = new SkipListNode<>(-1, null);
-    private final SkipListNode<T> tail = new SkipListNode<>(1, null);
+    private final SkipListNode<T> head = new SkipListNode<>("-1", null);
+    private final SkipListNode<T> tail = new SkipListNode<>("1", null);
 
     /**
      * 跳表的结点数（正无穷，负无穷，head、tail结点不算）
@@ -61,7 +61,7 @@ public class SkipList<T> {
      * 新增或者修改
      * @param key
      */
-    public void set(Integer key, T value) {
+    public void set(String key, T value) {
         // 根据key查询跳表中是否存在对应的节点
         SkipListNode<T> p = findNode(key);
         // 存在节点就修改值
@@ -81,7 +81,7 @@ public class SkipList<T> {
      * @param key key
      * @return 查到找的节点
      */
-    public SkipListNode<T> get(Integer key) {
+    public SkipListNode<T> get(String key) {
         SkipListNode<T> node = findNode(key);
         if (Objects.equals(node.getKey(), key)) {
             return node;
@@ -94,7 +94,7 @@ public class SkipList<T> {
      * @param key
      */
     @SuppressWarnings("unchecked")
-    public void remove(Integer key) {
+    public void remove(String key) {
         // 删除各层的节点
         SkipListNode<T> pointer = findNode(key);
         if (!Objects.equals(pointer.getKey(), key)) {
@@ -117,7 +117,7 @@ public class SkipList<T> {
      * @param key 键
      */
     @SuppressWarnings("unchecked")
-    private void probabilityUp(SkipListNode<T> q, Integer key) {
+    private void probabilityUp(SkipListNode<T> q, String key) {
         // 当前所在层数为0，底层是用于存value的
         int currentLevel = 0;
         // 指针指向新增节点
@@ -200,13 +200,13 @@ public class SkipList<T> {
      * @param key
      * @return
      */
-    private SkipListNode<T> findNode(Integer key) {
+    private SkipListNode<T> findNode(String key) {
         // 指针指向head,跳表的查询，从head或者tail开始
         SkipListNode<T> pointer = head.down;
         while (true) {
             // 如果一层只有正负无穷，就没必要水平查找了
             while (!pointer.right.getKey().equals(SkipListNode.POSITIVEINTEGER)
-                    && pointer.right.getKey() <= key) {
+                    && pointer.right.getKey().compareTo(key) <= 0) {
                 // 每层找最接近key的节点
                 pointer = pointer.right;
             }
