@@ -1,13 +1,9 @@
-import factory.ThreadPoolFactory;
-import protocol.MyProtocol;
+import socket.basic.Node;
 import socket.save.BgSave;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,11 +24,11 @@ public class ProtocolTest {
         service.scheduleAtFixedRate(()->
                 System.out.println("task ScheduledExecutorService "+new Date())
                 , 0, 1, TimeUnit.SECONDS);
-
-        Map<String, Object> reload = BgSave.reload();
-        for (String s : reload.keySet()) {
+        ConcurrentHashMap<String, Node<Object>> objectObjectConcurrentHashMap = new ConcurrentHashMap<>();
+        BgSave.reload(objectObjectConcurrentHashMap);
+        for (String s : objectObjectConcurrentHashMap.keySet()) {
             System.out.println(s);
-            System.out.println(reload.get(s));
+            System.out.println(objectObjectConcurrentHashMap.get(s));
         }
     }
 }

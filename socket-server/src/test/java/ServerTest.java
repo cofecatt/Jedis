@@ -7,12 +7,14 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import socket.basic.Node;
 import socket.basic.StrategyContext;
-import socket.basic.LocalMap;
+import socket.basic.StorageProducer;
 import socket.interfece.imp.SetOperationStrategy;
 
 import java.nio.charset.Charset;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author: HLJ
@@ -20,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ServerTest {
     public static void main(String[] args) throws InterruptedException {
-        ConcurrentHashMap<String, Object> instance = LocalMap.getInstance();
+        Map<String, Node<Object>> instance = StorageProducer.getConcurrentHashMap();
 
         new ServerBootstrap()
                 .group(new NioEventLoopGroup())

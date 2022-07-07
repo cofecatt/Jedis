@@ -5,8 +5,7 @@ import basic.Response;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import socket.basic.LocalMap;
-import socket.basic.SkipList;
+import socket.basic.StorageProducer;
 import socket.basic.StrategyContext;
 import socket.constant.OperationConstant;
 import socket.interfece.IOperationStrategy;
@@ -30,9 +29,9 @@ public class CommandHandler extends SimpleChannelInboundHandler<Command> {
                 StrategyContext strategyContext = new StrategyContext(operationStrategy);
                 String s = order.toLowerCase();
                 if(s.contains("h")) {
-                    res = strategyContext.opt(msg, LocalMap.getInstance());
+                    res = strategyContext.opt(msg, StorageProducer.getConcurrentHashMap());
                 } else {
-                    res = strategyContext.opt(msg, SkipList.def);
+                    res = strategyContext.opt(msg, StorageProducer.getSkipList());
                 }
             }
         }

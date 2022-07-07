@@ -1,12 +1,14 @@
 package socket.interfece.imp;
 
 import basic.Command;
-import socket.basic.SkipList;
+import socket.basic.Node;
 import socket.constant.Errors;
 import socket.interfece.IOperationStrategy;
 import socket.utils.CheckOperation;
 
+import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * @Author: HLJ
@@ -15,11 +17,12 @@ import java.util.Map;
 public class SetOperationStrategy implements IOperationStrategy {
 
     @Override
-    public Object operation(Command command, Map<String, Object> map) {
+    public Object operation(Command command, Map<String, Node<Object>> map) {
         if(CheckOperation.check(command)) {
             String key = command.getKey();
             Object value = command.getValue();
-            map.put(key, value);
+            Node<Object> objectNode = new Node<>(value, -100, System.currentTimeMillis());
+            map.put(key, objectNode);
         } else {
             return Errors.BAD_PARAM.toString();
         }
@@ -27,12 +30,12 @@ public class SetOperationStrategy implements IOperationStrategy {
     }
 
     @Override
-    public Object operation(Command command, SkipList skipList) {
+    public Object operation(Command command, ConcurrentSkipListMap skipList) {
         if(CheckOperation.check(command)) {
             String key = command.getKey();
             Object value = command.getValue();
             try {
-                skipList.set(key, value);
+                skipList.put(key, value);
             }catch (NumberFormatException e) {
                 e.printStackTrace();
                 return Errors.BAD_PARAM.toString();

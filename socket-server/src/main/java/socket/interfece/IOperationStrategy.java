@@ -1,9 +1,10 @@
 package socket.interfece;
 
 import basic.Command;
-import socket.basic.SkipList;
+import socket.basic.Node;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * @Author: HLJ
@@ -16,7 +17,7 @@ public interface IOperationStrategy {
      * @param map map 哈希表
      * @return
      */
-    Object operation(Command command, Map<String, Object> map);
+    Object operation(Command command, Map<String, Node<Object>> map);
 
 
     /**
@@ -25,5 +26,5 @@ public interface IOperationStrategy {
      * @param skipList 跳表
      * @return
      */
-    Object operation(Command command, SkipList skipList);
+    Object operation(Command command, ConcurrentSkipListMap<String, Node<Object>> skipList);
 }

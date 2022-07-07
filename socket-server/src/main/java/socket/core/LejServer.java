@@ -8,12 +8,13 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import socket.basic.LocalMap;
+import socket.basic.StorageProducer;
 import factory.ThreadPoolFactory;
 import protocol.MyProtocol;
 import protocol.ProtocolFrameDecoder;
 import socket.loader.DomainLoader;
 
+import java.util.HashMap;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,14 +24,10 @@ import java.util.logging.Logger;
  */
 public class LejServer {
     private final static Logger logger = Logger.getLogger("LejServer");
-    private final ConcurrentHashMap<String, Object> instance;
-    private final ThreadPoolExecutor executor;
-    private Domain resource;
+    private final Domain resource;
 
     public LejServer(){
         resource = DomainLoader.getResource();
-        instance = LocalMap.getInstance();
-        executor = ThreadPoolFactory.getDefault();
     }
 
     public void start(){

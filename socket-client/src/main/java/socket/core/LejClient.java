@@ -31,7 +31,6 @@ public class LejClient {
     private final static Logger logger = Logger.getLogger("LejClient");
     private static Channel channel = null;
     private static final Domain resource = DomainLoader.getResource();
-    private static final ThreadPoolExecutor threadPoolExecutor = ThreadPoolFactory.getDefault();
     private static final NioEventLoopGroup group;
     static  {
         group = new NioEventLoopGroup();
@@ -66,29 +65,27 @@ public class LejClient {
     }
 
     public static void main(String[] args) {
-        threadPoolExecutor.execute(() -> {
-
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print(resource.getIp()+":"+resource.getPort()+">");
-                String line = scanner.nextLine();
-                if ("exit".equals(line)) {
-                    channel.close();
-                    break;
-                }
-                String[] s = line.split(" ");
-                Command command = new Command();
-                if(s.length > 1) {
-                    command.setOrder(s[0]);
-                    command.setKey(s[1]);
-                }
-                if(s.length > 2) {
-                    command.setValue(s[2]);
-                }
-                command.setSequenceId(SequenceIdGenerator.nextId());
-                command.setMessageType(Message.Command);
-                channel.writeAndFlush(command);
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.print(resource.getIp()+":"+resource.getPort()+">");
+            String line = scanner.nextLine();
+            if ("exit".equals(line)) {
+                channel.close();
+                break;
             }
-        });
+            String[] s = line.split(" ");
+            Command command = new Command();
+            if(s.length > 1) {
+                command.setOrder(s[0]);
+                command.setKey(s[1]);
+            }
+            if(s.length > 2) {
+                command.setValue(s[2]);
+            }
+            command.setSequenceId(SequenceIdGenerator.nextId());
+            command.setMessageType(Message.Command);
+            channel.writeAndFlush(command);
+        }
+
     }
 }

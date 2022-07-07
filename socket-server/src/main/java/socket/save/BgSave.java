@@ -1,17 +1,16 @@
 package socket.save;
 
 import factory.ThreadPoolFactory;
-import socket.basic.LocalMap;
+import socket.basic.Node;
+import socket.basic.StorageProducer;
 import socket.loader.CustomLoader;
 
 import java.io.*;
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -24,14 +23,15 @@ public class BgSave {
     public static final ScheduledExecutorService executorService =
             (ScheduledExecutorService) ThreadPoolFactory.bgSaveThreadPool();
     public static String resource;
+
     static {
         resource = CustomLoader.getResource(SAVEFILENAME);
         executorService.scheduleAtFixedRate(()->
-                        bgSave(LocalMap.getInstance())
+                        bgSave(StorageProducer.getConcurrentHashMap())
                 , 0, 1, TimeUnit.SECONDS);
     }
 
-    public static boolean bgSave(Map<String, Object> map) {
+    public static void bgSave(Map<String, Node<Object>> map) {
         try(FileOutputStream fileOutputStream =
                     new FileOutputStream(Objects.requireNonNull(resource));
             ObjectOutputStream oos = new ObjectOutputStream(fileOutputStream)) {
@@ -43,35 +43,33 @@ public class BgSave {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            logger.log(Level.WARNING,"数据保存失败");
         }
         logger.info("保存数据成功");
-        return true;
     }
 
 
-    public static Map<String, Object> reload() {
-        ConcurrentHashMap<String, Object> concurrentHashMap = new ConcurrentHashMap<>();
+    public static void reload(Map<String, Node<Object>> map) {
         try(FileInputStream fileInputStream =
                     new FileInputStream(Objects.requireNonNull(resource));
             ObjectInputStream ois = new ObjectInputStream(fileInputStream)) {
             while (true) {
                 String k;
-                Object v;
+                Node<Object> v;
                 try {
                     k = (String) ois.readObject();
-                    v = ois.readObject();
+                    v = (Node<Object>) ois.readObject();
                 } catch (EOFException e) {
                     break;
                 }
                 if(k != null && v != null) {
-                    concurrentHashMap.put(k, v);
+                    map.put(k,  v);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            logger.log(Level.WARNING, "数据保存失败");
         }
         logger.info("加载数据成功");
-        return concurrentHashMap;
     }
 }
