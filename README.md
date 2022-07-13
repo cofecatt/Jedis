@@ -6,7 +6,7 @@
 
 ## 功能介绍
 
-改系统分为三个模块，分别为通信协议公共模块，客户端模块和服务端模块。采用netty和自定义协议进行双向NIO通信，目前基于ConcurrentSkipListMap和ConcurrentHashMap实现了set，get，hset，hget功能，采用异步线程将数据保存在test.txt中。
+改系统分为三个模块，分别为通信协议公共模块，客户端模块和服务端模块。采用netty和自定义协议进行双向NIO通信，目前基于ConcurrentSkipListMap和ConcurrentHashMap实现了set，get功能，采用异步线程将数据保存在test.txt中。
 
 
 
