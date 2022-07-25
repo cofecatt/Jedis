@@ -1,4 +1,4 @@
-# 							                        Jradis v1.0.1
+# 							                        Jredis v1.0.1
 
 ​														**基于java和netty打造的内存缓存**
 
